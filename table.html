@@ -15,11 +15,23 @@
 				line-height: 200px;
 				text-align: center;
 			}
+			td input[type='text']{
+				border:0;
+				outline:none;
+				width:100%;
+				overflow: hidden;
+				text-overflow:ellipsis;
+				white-space: nowrap;
+				background-color:transparent;
+
+			}
+
+
+				
 		</style>
         <style>
 				.laytable-cell-1-0-0 {
 					width: 48px;
-					height:auto;
 				}
 				
 				.laytable-cell-1-0-1 {
@@ -83,6 +95,32 @@
 				.clear{
 					clear:both;
 				}
+				
+				.layui-table-view .layui-table td.on{
+					background-color:green;
+					
+				}
+				.layui-table-view .layui-table td.on input[type='text']{
+
+					color:#fff;
+				}
+				
+							
+				.layui-table-view .layui-table td.on input::-webkit-input-placeholder {
+					/* placeholder颜色  */
+					color: #FFF;
+				}
+				
+				.layui-table-view .layui-table td.on input::-moz-input-placeholder {
+					/* placeholder颜色  */
+					color: #fff;
+				}
+				
+				.layui-table-view .layui-table td.on input::-ms-input-placeholder {
+					/* placeholder颜色  */
+					color: #fff;
+				}
+				
 
 			</style>
 	</head>
@@ -203,9 +241,6 @@
 										<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><i class="layui-icon layui-icon-ok"></i></div>
 									</div>
 								</th>
-								<th data-field="username"  class="">
-									<div class="layui-table-cell laytable-cell-1-0-2"><span>创建人</span></div>
-								</th>
 								<th data-field="experience" data-key="1-0-3" class=" layui-unselect">
 									<div class="layui-table-cell laytable-cell-1-0-3"><span>销售单号</span></div>
 								</th>
@@ -275,20 +310,18 @@
 					</table>
 					<table cellspacing="0" cellpadding="0" border="0" class="layui-table">
 						<tbody>
-							<tr data-index="0" class="" v-for='(tr,index) in tr' :data-id='tr.id' :key="tr.id">
+							<tr data-index="0" class="" v-for='(tr,index) in tr' :data-id='tr.ID' :key="tr.ID">
 								<td data-field="0" data-key="1-0-0" class="layui-table-col-special">
 									<div class="layui-table-cell laytable-cell-1-0-0 laytable-cell-checkbox"><input type="checkbox" name="layTableCheckbox" lay-skin="primary">
 										<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><i class="layui-icon layui-icon-ok"></i></div>
 									</div>
 								</td>
-								<td data-field="id" data-key="1-0-1" class="">
-									<div class="layui-table-cell laytable-cell-1-0-1">{{tr.creat_user}}</div>
-								</td>
+								
 								<td data-field="username" data-key="1-0-3" class="">
-									<div class="layui-table-cell laytable-cell-1-0-3">{{tr.sale_number}}</div>
+									<div class="layui-table-cell laytable-cell-1-0-3">{{tr.salenumber}}</div>
 								</td>
-								<td data-field="experience" data-key="1-0-6" class="">
-									<div class="layui-table-cell laytable-cell-1-0-6">{{tr.client}}</div>
+								<td data-field="experience" data-key="1-0-6" >
+									<div class="layui-table-cell laytable-cell-1-0-6">{{tr.client}} </div>
 								</td>
 								<td data-field="sex" data-key="1-0-6" class="">
 									<div class="layui-table-cell laytable-cell-1-0-6">{{tr.billing_time}}</div>
@@ -338,13 +371,15 @@
                                 <td data-field="wealth" data-key="1-0-9" class="">
 									<div class="layui-table-cell laytable-cell-1-0-9">{{tr.time_out}}</div>
 								</td>
-                                <td data-field="wealth" data-key="1-0-9" class="">
-									<div class="layui-table-cell laytable-cell-1-0-9">{{tr.remarks}}</div>
+                                <td data-field="wealth" data-key="1-0-9" :class="[pull==true?' ':'on']">
+									<div class="layui-table-cell laytable-cell-1-0-9">
+                                    	<input type="text" :placeholder="tr.remarks"  v-model='remarks'  :readonly='pull'>
+                                    </div>
 								</td>
 								<td data-field="10" data-key="1-0-10" align="center" data-off="true" class="layui-table-col-special">
 									<div class="layui-table-cell laytable-cell-1-0-10">
 										<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
-										<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+										<a href="javascript:;" class="layui-btn layui-btn-xs" lay-event="edit" @click='xiugai(tr.ID,tr.salenumber)'>编辑</a>
 										<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 									</div>
 								</td>
@@ -1023,8 +1058,13 @@
 				data: {
 					tr:[],
 					shuru:null,
+					
+					pull:true,//修改时使用
+					
+					remarks:'',
 				},
 				methods: {
+					//搜索
 					souya:function(){
 						var that = this;
 						function ischinese(s){
@@ -1034,7 +1074,8 @@
 							return ret;
 						}
 						if(ischinese(this.shuru)){
-							axios.get('http://123.235.23.206:6783/sale/cl?c='+that.shuru)
+							
+							axios.get('http://123.235.23.206:6783/api/v1//sale/cl?c='+that.shuru)
 						  .then(function(response){
 							  
 							 
@@ -1045,7 +1086,7 @@
 								console.log(error);//异常
 						  });
 						}else{
-							axios.get('http://123.235.23.206:6783/sale/qu?q='+that.shuru)
+							axios.get('http://123.235.23.206:6783/api/v1//sale/qu?q='+that.shuru)
 						  .then(function(response){
 
 								that.tr = response.data.data.sale;
@@ -1057,6 +1098,45 @@
 						}
 						
 					},
+					
+					
+					//更新
+					xiugai:function(id,salenumber){
+						
+						this.pull = !this.pull;
+						
+						var that = this;
+						
+						
+						if(this.pull){//'http://123.235.23.206:6783/api/v1/sale/up?id='+id+'&salenumber='+salenumber+'&remarks='+that.remarks
+
+							axios({
+								headers: {
+									
+									'Access-Control-Request-Method': 'PUT',
+									'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
+								},
+								method: 'put',
+								url: 'http://123.235.23.206:6783/api/v1/sale/up',
+								data: {
+									id:id,
+									salenumber:salenumber,
+									remarks:that.remarks
+								}
+							}).then(function(response){
+							  
+								console.log(response)
+	
+							  })
+							  .catch(function(error){
+									console.log(error);//异常
+							});
+							
+						}
+						
+					},
+					
+					
 				},
 			})
 			
